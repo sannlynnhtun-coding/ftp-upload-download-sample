@@ -1,34 +1,28 @@
-﻿using FluentFTP;
-
+﻿// FTP server details
 string host = "localhost";
 string username = "Sann Lynn Htun"; // Server User Name
 string password = "password"; // Server Password
 
-// Create an FTP client
-using (var client = new FtpClient(host, username, password))
+// Initialize the FTP service
+var ftpService = new FtpService(host, username, password);
+
+// Create a dynamic folder on the FTP server
+string remoteFolder = "/downloads";
+ftpService.CreateDirectory(remoteFolder);
+
+// Upload a file
+string localFilePath = @"D:\ftp-server\uploads\file.txt";
+string remoteFilePath = $"{remoteFolder}/file.txt";
+ftpService.UploadFile(localFilePath, remoteFilePath);
+
+// Download a file
+string downloadLocalPath = @"D:\ftp-server\uploads\downloaded_file.txt";
+ftpService.DownloadFile(downloadLocalPath, remoteFilePath);
+
+// List files in the remote directory
+var files = ftpService.ListFiles(remoteFolder);
+Console.WriteLine("Files in the remote directory:");
+foreach (var file in files)
 {
-    // Connect to the FTP server
-    client.Connect();
-
-    // Upload a file
-    string localFilePath = @"D:\ftp-server\uploads\file.txt";
-    string remoteFilePath = "/downloads/file.txt";
-    client.UploadFile(localFilePath, remoteFilePath);
-
-    Console.WriteLine("File uploaded successfully.");
-
-    // Download a file
-    string downloadLocalPath = @"D:\ftp-server\uploads\file.txt";
-    client.DownloadFile(downloadLocalPath, remoteFilePath);
-
-    Console.WriteLine("File downloaded successfully.");
-
-    // List files in a directory
-    foreach (var item in client.GetListing("/downloads"))
-    {
-        Console.WriteLine(item.Name);
-    }
-
-    // Disconnect from the FTP server
-    client.Disconnect();
+    Console.WriteLine(file);
 }
